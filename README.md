@@ -1,5 +1,5 @@
 # Versatile-ML-Predictor-with-TensorFlowJS-KNN
-This is a highly versatile and portable Supervised Machine Learning Program that utilises TensorFlow.js to implement the KNN algorithm to make prediction (i.e. a Label) based on ANY number/dimention of input data Features
+This is a highly versatile and portable Supervised Machine Learning Program that utilises `TensorFlow.js` to implement the `KNN` algorithm to make prediction (i.e. a Label) based on ANY number/dimention of input data Features
 
 ### Instruction for execution
 1. Clone the Repo </br> and cd into that cloned directory
