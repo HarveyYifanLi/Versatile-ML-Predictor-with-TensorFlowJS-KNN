@@ -26,7 +26,7 @@ i.e. Modify the following two lines in `index.js`:
  `labelColumns: ['"Age"'], // i.e. the labels,`
  
 2b) Due to the possibilities that some of data columns in your csv file might contain strings of very specific format (i.e. with arbitrary characters),
-all you need to do is to write customized string parsers/helper-functions and use them accordingly as part of the `converters`:
+all you need to do is to write customized string parsers/helper-functions (and add them to custome_feature_parsers.js) and use them accordingly as part of the `converters`:
 
 i.e. Modify the following in `index.js`:
 
