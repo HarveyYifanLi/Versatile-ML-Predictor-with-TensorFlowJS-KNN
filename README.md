@@ -17,20 +17,24 @@ A sample file named 'churned_customers_data.csv' with only one row of fake data 
 
 2. Based on your use cases, however wild that maybe, you simply need to modify the two spots of the program:
 <br/>
-a) Based on the headers of your csv file, specify what columns to use as Features and what target column as a Label for which to make a prediction
+2a) Based on the headers of your csv file, specify what columns to use as Features and what target column as a Label for which to make a prediction,
 
 i.e. Modify the following two lines in `index.js`:
 
  `dataColumns: ['"Renewal ARR"', '"Monthly Amount"', '"Signup Date"', '"Tier at close"', '"Account Count"'], // i.e. the features
+ 
  labelColumns: ['"Age"'], // i.e. the labels,`
  
-b) Due to the possibilities that some of data columns in the csv file might contain strings of very specific format (i.e. with arbitrary characters),
+2b) Due to the possibilities that some of data columns in the csv file might contain strings of very specific format (i.e. with arbitrary characters),
 all you need to do is to write customized string parsers/helper-functions and use them accordingly as part of the `converters`:
 
 i.e. Modify the following in `index.js`:
 
 `converters: { // create custom parsers to be able to parse ANY customized data columns
+
         '"Signup Date"' : parseCustomizedDateString,
+        
         '"Tier at close"' : parseCustomizedTierString,
+        
 }
 `
