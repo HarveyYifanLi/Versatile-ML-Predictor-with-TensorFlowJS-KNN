@@ -21,20 +21,19 @@ A sample file named 'churned_customers_data.csv' with only one row of fake data 
 
 i.e. Modify the following two lines in `index.js`:
 
- `dataColumns: ['"Renewal ARR"', '"Monthly Amount"', '"Signup Date"', '"Tier at close"', '"Account Count"'], // i.e. the features
+ `dataColumns: ['"Renewal ARR"', '"Monthly Amount"', '"Signup Date"', '"Tier at close"', '"Account Count"'], // i.e. the features`
  
- labelColumns: ['"Age"'], // i.e. the labels,`
+ `labelColumns: ['"Age"'], // i.e. the labels,`
  
 2b) Due to the possibilities that some of data columns in the csv file might contain strings of very specific format (i.e. with arbitrary characters),
 all you need to do is to write customized string parsers/helper-functions and use them accordingly as part of the `converters`:
 
 i.e. Modify the following in `index.js`:
 
-`converters: { // create custom parsers to be able to parse ANY customized data columns
+`converters: { // create custom parsers to be able to parse ANY customized data columns`
 
-        '"Signup Date"' : parseCustomizedDateString,
+`        '"Signup Date"' : parseCustomizedDateString,`
         
-        '"Tier at close"' : parseCustomizedTierString,
+`        '"Tier at close"' : parseCustomizedTierString,`
         
-}
-`
+`} `
