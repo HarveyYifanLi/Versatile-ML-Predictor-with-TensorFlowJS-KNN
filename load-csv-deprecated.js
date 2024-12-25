@@ -14,15 +14,14 @@ function extractColumns(data, columnNames) {
   return extracted;
 }
 
-module.exports = async function loadCSV(
+module.exports = function loadCSV(
   filename,
   {
     dataColumns = [], // i.e. an array of header strings representing the features
     labelColumns = [], // i.e. an array of header strings representing the labels
     converters = {},
     shuffle = false,
-    splitTest = false,
-    useLlmEmbedding = false,
+    splitTest = false
   }
 ) {
     let data = fs.readFileSync(filename, { encoding: 'utf-8' }); // returns a big string
