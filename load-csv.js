@@ -34,41 +34,47 @@ module.exports = async function loadCSV(
     const headers = _.first(data);
     console.log('headers', headers); // e.g. headers: ['"Renewal ARR"', '"Monthly Amount"', '"Age"', '"Tier at close"', '"Account Count"', '"Signup Date"']
 
-    data = _.map(data, (row, index) => {
-      // i.e. For each row:
-      if (index === 0) {
-        // skip while on the headers row
-        return row;
-      }
+    let processedData;
 
-      const convertedRow =  _.map(row, (element, index) => {
-        // i.e. For each column on this row:
-        // console.log('element', element); // i.e. element represents the data on each column on a certain row
-        // console.log('converters[headers[index]]', converters[headers[index]]); // i.e. converters[headers[index]] returns the customized function for that header string that was sent as input when calling loadCSV()
-        if (converters[headers[index]]) {
-          const converted = converters[headers[index]](element);
-
-          return _.isNaN(converted) ? 0 : converted;
+    if (!useLlmEmbedding) {
+      processedData = _.map(data, (row, index) => {
+        // i.e. For each row:
+        if (index === 0) {
+          // skip while on the headers row
+          return row;
         }
+  
+        const convertedRow =  _.map(row, (element, index) => {
+          // i.e. For each column on this row:
+          // console.log('element', element); // i.e. element represents the data on each column on a certain row
+          // console.log('converters[headers[index]]', converters[headers[index]]); // i.e. converters[headers[index]] returns the customized function for that header string that was sent as input when calling loadCSV()
+          if (converters[headers[index]]) {
+            const converted = converters[headers[index]](element);
+  
+            return _.isNaN(converted) ? 0 : converted;
+          }
+          // check if current column's value is already a number "in essence"
+          const columnOFNumberValue = !!(typeof element === 'string' && parseFloat(element));
+  
+          let result;
+          // if column is already a number "in essence", parse it directly
+          // else return 0
+          if (columnOFNumberValue) {
+            result = parseFloat(element.replaceAll('"', '').replaceAll('\'', ''));
+          } else {
+            result = 0;
+          }
+  
+          return _.isNaN(result) ? 0 : result;
+        });
 
-        const columnOFNumberValue = !!(typeof element === 'string' && parseFloat(element));
-
-        let result;
-        // if column is already a number "in essence", parse it directly
-        // else use LLM vector embedding to obtain a meaningful number from it
-        if (columnOFNumberValue) {
-          result = parseFloat(element.replaceAll('"', '').replaceAll('\'', ''));
-        } else {
-          // use LLM Vector embedding to create a vector of numbers from this column element
-          // const embedding = await getEmbedding(element);
-        }
-
-        return _.isNaN(result) ? 0 : result;
+        return convertedRow;
       });
-      // console.log('row: ', row, ', index: ', index);
-      // console.log('convertedRow: ', convertedRow);
-      return convertedRow;
-    });
+    } else {
+      console.log('************************');
+    }
+
+    data = processedData;
 
     let labels = extractColumns(data, labelColumns); // i.e. the labels, nested 2D array, of the same length as the features
     data = extractColumns(data, dataColumns); // i.e. the features, nested 2D array, of the same length as the labels
