@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "@tensorflow/tfjs-node": "^0.1.17",
+    "dotenv": "^16.4.7",
     "lodash": "^4.17.11",
+    "openai": "^4.77.0",
     "shuffle-seed": "^1.1.6"
   }
 }

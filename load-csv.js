@@ -49,7 +49,17 @@ module.exports = function loadCSV(
           return _.isNaN(converted) ? 0 : converted;
         }
 
-        const result = parseFloat(element.replaceAll('"', '').replaceAll('\'', ''));
+        const columnOFNumberValue = !!(typeof element === 'string' && parseFloat(element));
+
+        let result;
+        // if column is already a number "in essence", parse it directly
+        // else use LLM vector embedding to obtain a meaningful number from it
+        if (columnOFNumberValue) {
+          result = parseFloat(element.replaceAll('"', '').replaceAll('\'', ''));
+        } else {
+          // use LLM Vector embedding to create a vector of numbers from this column element
+        }
+
 
         return _.isNaN(result) ? 0 : result;
       });
