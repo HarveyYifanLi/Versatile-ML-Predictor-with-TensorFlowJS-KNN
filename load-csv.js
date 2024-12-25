@@ -1,6 +1,7 @@
 const fs = require('fs');
 const _ = require('lodash');
 const shuffleSeed = require('shuffle-seed');
+const { getEmbedding } = require('./llms');
 
 function extractColumns(data, columnNames) {
   // data is an array of arrays
@@ -58,8 +59,8 @@ module.exports = function loadCSV(
           result = parseFloat(element.replaceAll('"', '').replaceAll('\'', ''));
         } else {
           // use LLM Vector embedding to create a vector of numbers from this column element
+          // const embedding = await getEmbedding(element);
         }
-
 
         return _.isNaN(result) ? 0 : result;
       });
