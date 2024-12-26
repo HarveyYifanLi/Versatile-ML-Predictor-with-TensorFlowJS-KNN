@@ -10,9 +10,10 @@ async function main() {
     let { features, labels, testFeatures, testLabels } = await loadCSV(datasetFile, {
         shuffle: false, // shuffle all the rows of the dataset
         splitTest: undefined || 'default', // number of records to use as test dataset (default to 1/5 of all data), the rest are all training dataset,
-        useLlmEmbedding: false, // use LLM vector embedding for each column's value along each row
+        useLlmEmbedding: true, // use LLM vector embedding for each column's value along each row
         dataColumns: ['"Renewal ARR"', '"Monthly Amount"', '"Signup Date"', '"Tier at close"', '"Account Count"'], // i.e. the features
-        labelColumns: ['"Age"'], // i.e. the labels,
+        labelColumns: ['"Age"\r'], // i.e. the labels, NOTE on the \r for the return char at the end of the header column. 
+        // Including \r is a MUST, IF said column is the LAST column of the header row, else \r is not needed
         converters: { // create custom parsers to be able to parse ANY customized data columns
             '"Signup Date"' : parseCustomizedDateString,
             '"Tier at close"' : parseCustomizedTierString,
@@ -25,6 +26,8 @@ async function main() {
     // Calculate the mean and variance tensors for the features Tensor which will be used for numerical standardization to normalize features data
     const { mean, variance } = getMeanAndVarianceTensors(featuresTensor, 0);
 
+    // console.log('Features: ', features); 
+    // console.log('Labels: ', labels);
     console.log('testFeatures: ', testFeatures); 
     console.log('testLabels: ', testLabels);
 

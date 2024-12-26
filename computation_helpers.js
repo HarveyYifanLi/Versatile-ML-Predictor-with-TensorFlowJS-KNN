@@ -56,4 +56,15 @@ function trainWithKNN(features, labels, featureTensorForPrediction, k, mean, var
  return predictedResult;
 }
 
-module.exports = { getMeanAndVarianceTensors, trainWithKNN };
+/** From Information Theory: Calculate the Entropy of a Random Variable that is an array of numbers
+* params embedding: an array of numbers
+* returns total: the Entropy of this embedding Random Variable accordingly to Information Theory
+*/
+function calculateEntropy(embedding) {
+    const total = embedding.reduce((sum, value) => sum + Math.abs(value), 0);
+    return -embedding
+      .map((value) => Math.abs(value) / total)
+      .reduce((entropy, prob) => (prob > 0 ? entropy + prob * Math.log2(prob) : entropy), 0);
+}
+
+module.exports = { getMeanAndVarianceTensors, trainWithKNN, calculateEntropy };

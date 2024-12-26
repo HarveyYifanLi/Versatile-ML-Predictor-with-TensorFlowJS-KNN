@@ -2,6 +2,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const shuffleSeed = require('shuffle-seed');
 const { getEmbedding } = require('./llms');
+const { calculateEntropy} = require('./computation_helpers');
 
 function extractColumns(data, columnNames) {
   // data is an array of arrays
@@ -34,10 +35,9 @@ module.exports = async function loadCSV(
     const headers = _.first(data);
     console.log('headers', headers); // e.g. headers: ['"Renewal ARR"', '"Monthly Amount"', '"Age"', '"Tier at close"', '"Account Count"', '"Signup Date"']
 
-    let processedData;
-
     if (!useLlmEmbedding) {
-      processedData = _.map(data, (row, index) => {
+      // parse each column of each row directly without using LLM vector embedding
+      data = _.map(data, (row, index) => {
         // i.e. For each row:
         if (index === 0) {
           // skip while on the headers row
@@ -48,6 +48,7 @@ module.exports = async function loadCSV(
           // i.e. For each column on this row:
           // console.log('element', element); // i.e. element represents the data on each column on a certain row
           // console.log('converters[headers[index]]', converters[headers[index]]); // i.e. converters[headers[index]] returns the customized function for that header string that was sent as input when calling loadCSV()
+          // if a custom converter function exists, use it to parse the value
           if (converters[headers[index]]) {
             const converted = converters[headers[index]](element);
   
@@ -70,11 +71,50 @@ module.exports = async function loadCSV(
 
         return convertedRow;
       });
-    } else {
-      console.log('************************');
-    }
+    } else { // use LLM vector embedding for a column that's non-numeric
+      //resolve outer array of promises each of which is from processing each row's data
+      data = await Promise.all(
+        _.map(data, async (row, index) => {
+          // i.e. For each row:
+          if (index === 0) {
+            // skip while on the headers row
+            return row;
+          }
+          // resolve inner array of promises each of which is from processing each column's data
+          const convertedRow = await Promise.all(
+            _.map(row, async (element, index) => {
+              // i.e. For each column on this row:
+              // if a custom converter function exists, use it to parse the value
+              if (converters[headers[index]]) {
+                const converted = converters[headers[index]](element);
+      
+                return _.isNaN(converted) ? 0 : converted;
+              }
+              // check if current column's value is already a number "in essence"
+              const columnOFNumberValue = !!(typeof element === 'string' && parseFloat(element));
+      
+              let result;
+              // if column is already a number "in essence", parse it directly
+              // else use LLM vector embedding for it, then calculate and return its entropy as a number
+              if (columnOFNumberValue) {
+                result = parseFloat(element.replaceAll('"', '').replaceAll('\'', ''));
+              } else {
+                console.log('------------------- Vector Embedding Process Initiated -----------------------------');
+                const embedding = await getEmbedding(element);
+                // console.log('embedding', embedding);
+                const entropyOfEmbedding = calculateEntropy(embedding);
+                // console.log('entropyOfEmbedding', entropyOfEmbedding);
+                result = entropyOfEmbedding;
+              }
+      
+              return _.isNaN(result) ? 0 : result;
+            })
+          );
 
-    data = processedData;
+          return convertedRow;
+        })
+      );
+    }
 
     let labels = extractColumns(data, labelColumns); // i.e. the labels, nested 2D array, of the same length as the features
     data = extractColumns(data, dataColumns); // i.e. the features, nested 2D array, of the same length as the labels
