@@ -4,6 +4,15 @@ For instance, it can take a csv file with churned customers data and parse ANY n
 and make a prediction on another targeted data column, namely a `Label`, such as 'Age' which specifies how long a customer has stayed with
 the company before churning.
 
+UPDATE:
+Now the program has been updated to utilize the super power of LLM Vector Embedding.
+
+Specifically, (IF you opt to use it) LLM Vector Embedding will be automatically triggered on non-numeric columns, which will convert it from a non-numeric value, say a string, to a meaningful number value eventually. 
+A combination of Vector Embedding + Entropy calculation is implemented to achieve this. (See `function calculateEntropy` for details on the Entropy calculation)
+
+You have the flexibility to choose whether to use Vector Embedding or not by setting the param `useLlmEmbedding: true/false`
+when calling `await loadCSV(...)` inside of `index.js`;
+
 ### Instructions for execution
 1. Clone the Repo and cd into that cloned directory
 2. Install TensorFlow.js and all other related Dependencies specified in `package.json` via command:
@@ -37,3 +46,9 @@ i.e. Modify the following in `index.js`:
 `        '"Tier at close"' : parseCustomizedTierString,`
         
 `} `
+
+2c) IF you choose to use LLM Vector Embedding to be able to automatically convert non-numeric columns to number values and hence no longer needing to provide ANY custom converter functions specified in step `2b)` (i.e. leaving `converters: {}` as default):
+
+-> create a `.env` file (see `.env.example`) and set your own OpenAI key
+
+-> within `index.js` set the param `useLlmEmbedding: true` when calling `await loadCSV(...)`;
